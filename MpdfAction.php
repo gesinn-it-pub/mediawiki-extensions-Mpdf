@@ -108,18 +108,18 @@ class MpdfAction extends Action {
 				wfMkdirParents( _MPDF_TTFONTDATAPATH );
 			}
 
-			$mpdf = new mPDF( 
-				$mode, 
-				$format, 
-				0, 
-				'', 
-				$marginLeft, 
-				$marginRight, 
-				$marginTop, 
-				$marginBottom, 
-				$marginHeader, 
-				$marginFooter, 
-				$orientation 
+			$mpdf = new mPDF(
+				$mode,
+				$format,
+				0,
+				'',
+				$marginLeft,
+				$marginRight,
+				$marginTop,
+				$marginBottom,
+				$marginHeader,
+				$marginFooter,
+				$orientation
 			);
 
 			// Suppress warning messages, because the mPDF library
