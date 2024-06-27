@@ -3,8 +3,6 @@
  * Handles the 'mpdf' action.
  */
 
-// require_once __DIR__ . '/../../vendor/autoload.php';
-
 use MediaWiki\MediaWikiServices;
 
 class MpdfAction extends Action {

@@ -40,12 +40,5 @@
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true
 		}
-	},
-	"extra": {
-        "merge-plugin": {
-            "include": [
-                "extensions/Mpdf/composer.json"
-            ]
-        }
-    }
+	}
 }
