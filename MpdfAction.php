@@ -3,7 +3,7 @@
  * Handles the 'mpdf' action.
  */
 
-require_once __DIR__ . '/../../vendor/autoload.php';
+// require_once __DIR__ . '/../../vendor/autoload.php';
 
 use MediaWiki\MediaWikiServices;
 
