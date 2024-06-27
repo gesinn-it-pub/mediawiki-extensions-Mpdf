@@ -2,7 +2,7 @@
 	"name": "gesinn-it-pub/mpdf",
   	"type": "mediawiki-extension",
 	"require": {
-		"mpdf/mpdf": "^6.1"
+		"mpdf/mpdf": "^8"
 	},
 	"require-dev": {
 		"mediawiki/mediawiki-codesniffer": "43.0.0",
