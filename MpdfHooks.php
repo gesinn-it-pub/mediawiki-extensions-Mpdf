@@ -8,7 +8,7 @@ class MpdfHooks {
 	 * @param Parser &$parser
 	 */
 	public static function onParserFirstCallInit( Parser &$parser ) {
-		$parser->setFunctionHook( 'mpdftags', 'MpdfHooks::mpdftags_Render' );
+		$parser->setFunctionHook( 'mpdftags', 'MpdfHooks::mpdftagsRender' );
 	}
 
 	/**
@@ -65,7 +65,7 @@ class MpdfHooks {
 	 * @param Parser &$parser
 	 * @return mixed
 	 */
-	public static function mpdftags_Render( &$parser ) {
+	public static function mpdftagsRender( &$parser ) {
 		// Get the parameters that were passed to this function
 		$params = func_get_args();
 		array_shift( $params );
