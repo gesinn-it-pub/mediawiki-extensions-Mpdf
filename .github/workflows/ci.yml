@@ -33,7 +33,7 @@ jobs:
             ps_version: 0.8
             database_type: mysql
             database_image: "mysql:8"
-            coverage: false
+            coverage: true
             experimental: true
 
     env:
