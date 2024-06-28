@@ -14,6 +14,9 @@ class MpdfActionTest extends MediaWikiUnitTestCase {
 	 */
 	protected $wgMpdfSimpleOutput;
 
+	/**
+	 * @covers MpdfAction::getName
+	 */
 	public function testGetNameReturnsCorrectActionName() {
 		$action = $this->getMockBuilder( MpdfAction::class )
 					   ->disableOriginalConstructor()
@@ -31,6 +34,9 @@ class MpdfActionTest extends MediaWikiUnitTestCase {
 		$this->assertEquals( 'mpdf', $name );
 	}
 
+	/**
+	 * @covers MpdfAction::show
+	 */
 	public function testCheckOutputOfHtmlInsideShowMethod() {
 		// Set up expectations
 		$titleText = 'Test_Title';
