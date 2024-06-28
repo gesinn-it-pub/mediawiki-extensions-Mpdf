@@ -1,0 +1,9 @@
+:project_name: Mpdf
+= {project_name}
+
+image:https://github.com/gesinn-it-pub/mediawiki-extensions-Mpdf/actions/workflows/ci.yml/badge.svg[CI,link=https://github.com/gesinn-it-pub/mediawiki-extensions-Mpdf/actions/workflows/ci.yml]
+
+{project_name} is a MediaWiki extension that lets you export the printable version of a page as a PDF file.
+
+== Documentation
+For documentation see: https://www.mediawiki.org/wiki/Extension:Mpdf
