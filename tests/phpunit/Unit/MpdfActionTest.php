@@ -7,6 +7,11 @@ use MediaWiki\MediaWikiServices;
  */
 class MpdfActionTest extends MediaWikiUnitTestCase {
 
+	/**
+	 * Configuration setting for determining whether to use simple output mode in mPDF.
+	 *
+	 * @var bool
+	 */
 	protected $wgMpdfSimpleOutput;
 
 	public function testGetNameReturnsCorrectActionName() {
