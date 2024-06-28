@@ -61,14 +61,14 @@ class MpdfActionTest extends MediaWikiUnitTestCase {
 		$outputPageMock->expects( $this->any() )
 					->method( 'output' )
 					->willReturn( $outputHtml );
-		 
+
 		$titleToCheck = $titleMock->getPrefixedText();
 		$format = 'html';
 		$output = $outputPageMock;
 
 		$filename = str_replace( [ '\\', '/', ':', '*', '?', '"', '<', '>', "\n", "\r", "\0" ], '_', $titleText );
 		MediaWikiServices::getInstance()->getHookContainer()->run( 'MpdfGetArticle', [ $titleText, &$article ] );
-		
+
 		$this->assertEquals( $titleText, $titleToCheck );
 
 		if ( !$this->wgMpdfSimpleOutput ) {
@@ -79,7 +79,7 @@ class MpdfActionTest extends MediaWikiUnitTestCase {
 
 			$html = $articleMock->view();
 			$outputPageMock->output();
-			
+
 			$this->assertStringContainsString( "Test HTML", $html );
 			$html = ob_get_clean();
 		}
