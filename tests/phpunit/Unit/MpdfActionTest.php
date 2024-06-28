@@ -80,7 +80,7 @@ class MpdfActionTest extends MediaWikiUnitTestCase {
 			$html = $articleMock->view();
 			$outputPageMock->output();
 			
-            $this->assertStringContainsString( "Test HTML" , $html);
+            $this->assertStringContainsString( "Test HTML", $html);
             $html = ob_get_clean();
         }
     }
