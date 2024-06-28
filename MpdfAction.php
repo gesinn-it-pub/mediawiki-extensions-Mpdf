@@ -39,7 +39,6 @@ class MpdfAction extends Action {
 			$footer = "<p><em>$url</em></p><h1>$titletext</h1>\n";
 			$html = $footer . ob_get_clean();
 		} else {
-			$output->setPrintable();
 			$article->view();
 			ob_start();
 			$output->output();
@@ -106,7 +105,20 @@ class MpdfAction extends Action {
 				wfMkdirParents( _MPDF_TTFONTDATAPATH );
 			}
 
-			$mpdf = new mPDF( $mode, $format, 0, '', $marginLeft, $marginRight, $marginTop, $marginBottom, $marginHeader, $marginFooter, $orientation );
+			// Configuration array
+			$config = [
+				'mode' => $mode,
+				'format' => $format,
+				'margin_left' => $marginLeft,
+				'margin_right' => $marginRight,
+				'margin_top' => $marginTop,
+				'margin_bottom' => $marginBottom,
+				'margin_header' => $marginHeader,
+				'margin_footer' => $marginFooter,
+				'orientation' => $orientation
+			];
+
+			$mpdf = new \Mpdf\Mpdf( $config );
 
 			// Suppress warning messages, because the mPDF library
 			// itself generates warnings (due to trying to add
