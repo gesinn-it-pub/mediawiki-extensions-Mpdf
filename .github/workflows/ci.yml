@@ -11,21 +11,19 @@ jobs:
 
   test:
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     continue-on-error: ${{ matrix.experimental }}
 
     strategy:
       matrix:
         include:
-          - mediawiki_version: '1.35'
-            smw_version: '4.1.3'    
+          - mediawiki_version: '1.35'  
             php_version: 7.4    
             database_type: mysql
             database_image: "mysql:5.7"
             coverage: true
             experimental: false
           - mediawiki_version: '1.39'
-            smw_version: dev-master
             php_version: 8.1
             database_type: mysql
             database_image: "mysql:8"
@@ -34,7 +32,6 @@ jobs:
 
     env:
       MW_VERSION: ${{ matrix.mediawiki_version }}
-      SMW_VERSION: ${{ matrix.smw_version }}
       PHP_VERSION: ${{ matrix.php_version }}
       DB_TYPE: ${{ matrix.database_type }}
       DB_IMAGE: ${{ matrix.database_image }}
