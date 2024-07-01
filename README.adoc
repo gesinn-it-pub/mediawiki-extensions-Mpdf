@@ -2,7 +2,7 @@
 = {project_name}
 
 image:https://github.com/gesinn-it-pub/mediawiki-extensions-Mpdf/actions/workflows/ci.yml/badge.svg[CI,link=https://github.com/gesinn-it-pub/mediawiki-extensions-Mpdf/actions/workflows/ci.yml]
-image:https://codecov.io/github/gesinn-it-pub/mediawiki-extensions-Mpdf/branch/master/graph/badge.svg?token=dihJ4cJWer[Codecov]
+image:https://codecov.io/gh/gesinn-it-pub/mediawiki-extensions-Mpdf/branch/master/graph/badge.svg?token=dihJ4cJWer[Codecov]
 
 {project_name} is a MediaWiki extension that lets you export the printable version of a page as a PDF file.
 
