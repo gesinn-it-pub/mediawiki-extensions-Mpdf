@@ -119,7 +119,8 @@ class MpdfAction extends Action {
 			];
 
 			$mpdf = new \Mpdf\Mpdf( $config );
-
+			
+			$mpdf->showImageErrors = true;
 			// Suppress warning messages, because the mPDF library
 			// itself generates warnings (due to trying to add
 			// variables with a value of 'auto'), and if these get
