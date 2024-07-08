@@ -53,6 +53,35 @@ class MpdfAction extends Action {
 			$output->disable();
 			header( "Content-Type: text/html" );
 			header( "Content-Disposition: attachment; filename=\"$filename.html\"" );
+			// Create a new DOMDocument instance
+			$dom = new DOMDocument;
+			// Load HTML content, suppress errors for malformed HTML
+			libxml_use_internal_errors( true );
+			$dom->loadHTML( $html );
+			libxml_clear_errors();
+
+			// Create a new DOMXPath instance
+			$xpath = new DOMXPath( $dom );
+
+			// Query for all <img> tags
+			$imgTags = $xpath->query( '//img' );
+
+			// Loop through the <img> tags and output attributes
+			foreach ( $imgTags as $img ) {
+				$src = $img->getAttribute( 'src' );
+				$src = ltrim( $src, '/' );
+
+				$imageData = base64_encode( file_get_contents( $src ) );
+
+				// Create data URI for the image
+				$dataUri = 'data:image/' . pathinfo( $src, PATHINFO_EXTENSION ) . ';base64,' . $imageData;
+
+				// Set the src attribute to the data URI
+				$img->setAttribute( 'src', $dataUri );
+
+				// Get the updated HTML content after modifying img tags
+				$html = $dom->saveHTML();
+			}
 			print $html;
 		} else {
 			// return pdf file
