@@ -119,6 +119,11 @@ class MpdfAction extends Action {
 			];
 
 			$mpdf = new \Mpdf\Mpdf( $config );
+			// set base url to help rendering images inside mpdf
+			$url = 'http://127.0.0.1/';
+			$mpdf->setBasePath( $url );
+
+			$mpdf->showImageErrors = true;
 
 			// Suppress warning messages, because the mPDF library
 			// itself generates warnings (due to trying to add
@@ -143,5 +148,4 @@ class MpdfAction extends Action {
 		}
 		$output->disable();
 	}
-
 }
