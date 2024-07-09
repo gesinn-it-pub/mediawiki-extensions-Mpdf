@@ -148,9 +148,15 @@ class MpdfAction extends Action {
 			];
 
 			$mpdf = new \Mpdf\Mpdf( $config );
+
+			// Determine the base URL dynamically
+			$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+			$host = $_SERVER['HTTP_HOST'];
+			$baseUrl = $protocol . $_SERVER['HTTP_HOST'] . '/';
+
 			// set base url to help rendering images inside mpdf
-			$url = 'http://127.0.0.1/';
-			$mpdf->setBasePath( $url );
+			// $url = 'http://127.0.0.1/';
+			$mpdf->setBasePath( $baseUrl );
 
 			$mpdf->showImageErrors = true;
 
