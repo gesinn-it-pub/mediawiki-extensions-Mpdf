@@ -1,4 +1,4 @@
--include .env-39
+#-include .env-39
 export
 
 # setup for docker-compose-ci build directory
