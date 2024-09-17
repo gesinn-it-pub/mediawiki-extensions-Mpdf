@@ -8,7 +8,7 @@ class MpdfHooks {
 	 * @param Parser &$parser
 	 */
 	public static function onParserFirstCallInit( Parser &$parser ) {
-		$parser->setFunctionHook( 'mpdftags', 'MpdfHooks::mpdftagsRender' );
+		$parser->setFunctionHook( 'mpdftags', [ 'MpdfHooks', 'mpdftagsRender' ] );
 	}
 
 	/**

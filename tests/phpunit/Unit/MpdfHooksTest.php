@@ -12,6 +12,21 @@ class MpdfHooksTest extends MediaWikiUnitTestCase {
 	}
 
 	/**
+	 * @covers MpdfHooks::onParserFirstCallInit
+	 */
+	public function testOnParserFirstCallInit() {
+		$parser = $this->createMock( Parser::class );
+		$parser->expects( $this->once() )
+			->method( 'setFunctionHook' )
+			->with(
+				'mpdftags',
+				$this->equalTo( [ 'MpdfHooks', 'mpdftagsRender' ] )
+			);
+
+		MpdfHooks::onParserFirstCallInit( $parser );
+	}
+
+	/**
 	 * @covers MpdfHooks::onSidebarBeforeOutput
 	 */
 	public function testOnSidebarBeforeOutputWhenMpdfToolboxLinkIsFalse() {
