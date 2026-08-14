@@ -35,9 +35,7 @@ class MpdfAction extends Action {
 			$article->render();
 			ob_start();
 			$output->output();
-			$url = $title->getFullURL();
-			$footer = "<p><em>$url</em></p><h1>$titletext</h1>\n";
-			$html = $footer . ob_get_clean();
+			$html = self::buildSimpleOutputHtml( $title->getFullURL(), $titletext, ob_get_clean() );
 		} else {
 			$article->view();
 			ob_start();
@@ -51,8 +49,9 @@ class MpdfAction extends Action {
 		// If format=html in query-string, return html content directly
 		if ( $format === 'html' ) {
 			$output->disable();
-			header( "Content-Type: text/html" );
-			header( "Content-Disposition: attachment; filename=\"$filename.html\"" );
+			foreach ( self::buildHtmlDownloadHeaders( $filename ) as $header ) {
+				header( $header );
+			}
 
 			print self::inlineImagesAsDataUris( $html );
 			return;
@@ -97,6 +96,34 @@ class MpdfAction extends Action {
 	 */
 	private static function sanitizeFilename( $titletext ) {
 		return str_replace( [ '\\', '/', ':', '*', '?', '"', '<', '>', "\n", "\r", "\0" ], '_', $titletext );
+	}
+
+	/**
+	 * Build the HTML shown in "simple output" mode: a source-URL/title
+	 * footer prepended to the rendered article body.
+	 *
+	 * @param string $url
+	 * @param string $titletext
+	 * @param string $bodyHtml
+	 * @return string
+	 */
+	private static function buildSimpleOutputHtml( $url, $titletext, $bodyHtml ) {
+		$footer = "<p><em>$url</em></p><h1>$titletext</h1>\n";
+		return $footer . $bodyHtml;
+	}
+
+	/**
+	 * Build the HTTP headers needed to stream the page as a downloadable
+	 * HTML file.
+	 *
+	 * @param string $filename
+	 * @return string[]
+	 */
+	private static function buildHtmlDownloadHeaders( $filename ) {
+		return [
+			'Content-Type: text/html',
+			"Content-Disposition: attachment; filename=\"$filename.html\"",
+		];
 	}
 
 	/**

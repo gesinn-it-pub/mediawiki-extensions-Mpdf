@@ -31,6 +31,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   image-to-data-URI logic extracted into private static helpers (`sanitizeFilename()`,
   `parseMpdfConfig()`, `inlineImagesAsDataUris()`/`imageSrcToDataUri()`) so they can be
   unit tested directly; behavior is unchanged.
+- `MpdfAction::show()`'s simple-output footer HTML and HTML-download HTTP headers
+  extracted into `buildSimpleOutputHtml()`/`buildHtmlDownloadHeaders()`, and covered by
+  both unit tests and a `MediaWikiIntegrationTestCase` driving `show()` end-to-end for
+  the `format=html` and `$wgMpdfSimpleOutput` branches, raising `MpdfAction` line coverage
+  from 44.09% to 83.51% (project-wide: 54.84% to 84.38%).
 - `MpdfHooks::mpdftagsRender()` changed from an untyped `&$parser` parameter plus
   `func_get_args()` to a typed `Parser $parser, ...$params` signature, matching the
   pattern used by sibling parser-function hooks in this org.

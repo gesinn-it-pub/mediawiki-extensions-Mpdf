@@ -24,6 +24,18 @@ class MpdfActionTest extends MediaWikiUnitTestCase {
 		return $method->invoke( null, $html );
 	}
 
+	private function callBuildSimpleOutputHtml( string $url, string $titletext, string $bodyHtml ): string {
+		$method = new ReflectionMethod( MpdfAction::class, 'buildSimpleOutputHtml' );
+		$method->setAccessible( true );
+		return $method->invoke( null, $url, $titletext, $bodyHtml );
+	}
+
+	private function callBuildHtmlDownloadHeaders( string $filename ): array {
+		$method = new ReflectionMethod( MpdfAction::class, 'buildHtmlDownloadHeaders' );
+		$method->setAccessible( true );
+		return $method->invoke( null, $filename );
+	}
+
 	/**
 	 * @covers MpdfAction::sanitizeFilename
 	 * @dataProvider provideUnsafeFilenameCharacters
@@ -116,5 +128,33 @@ class MpdfActionTest extends MediaWikiUnitTestCase {
 		// Everything else keeps its default.
 		$this->assertSame( 'P', $config['orientation'] );
 		$this->assertSame( 15, $config['margin_left'] );
+	}
+
+	/**
+	 * @covers MpdfAction::buildSimpleOutputHtml
+	 */
+	public function testBuildSimpleOutputHtmlPrependsUrlAndTitleFooter() {
+		$html = $this->callBuildSimpleOutputHtml(
+			'https://example.org/wiki/Test_Title',
+			'Test_Title',
+			'<p>Body</p>'
+		);
+
+		$this->assertSame(
+			"<p><em>https://example.org/wiki/Test_Title</em></p><h1>Test_Title</h1>\n<p>Body</p>",
+			$html
+		);
+	}
+
+	/**
+	 * @covers MpdfAction::buildHtmlDownloadHeaders
+	 */
+	public function testBuildHtmlDownloadHeadersReturnsContentTypeAndDisposition() {
+		$headers = $this->callBuildHtmlDownloadHeaders( 'Test_Title' );
+
+		$this->assertSame( [
+			'Content-Type: text/html',
+			'Content-Disposition: attachment; filename="Test_Title.html"',
+		], $headers );
 	}
 }
