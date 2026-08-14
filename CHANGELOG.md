@@ -61,6 +61,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `getName()`.
 - Removed the dead `wfSuppressWarnings()`/`wfRestoreWarnings()` pre-MW-1.31 fallback from
   `MpdfAction::show()`, since this extension's minimum supported version is now MW 1.39.
+- Resolved all 17 Dependabot alerts on `package-lock.json` (js-yaml, minimatch, lodash,
+  brace-expansion, flatted, picomatch, ajv, cross-spawn, micromatch, yaml — all transitive
+  dev/lint tooling, none reachable at runtime) by bumping `grunt` from 1.6.1 to 1.6.3 and
+  running `npm audit fix`; no semver-major changes involved.
 - `MpdfAction::show()` called `\Wikimedia\suppressWarnings()`/`\Wikimedia\restoreWarnings()`,
   which no longer exist as of MW 1.43 — every PDF export (the extension's core feature) fataled
   with `Call to undefined function Wikimedia\suppressWarnings()` before reaching mPDF's own
