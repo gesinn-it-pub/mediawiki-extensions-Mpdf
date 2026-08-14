@@ -1,24 +1,24 @@
-#-include .env-39
+-include .env
 export
 
 # setup for docker-compose-ci build directory
 # delete "build" directory to update docker-compose-ci
 
-ifeq (,$(wildcard ./build/Makefile))
+ifeq (,$(wildcard ./build/))
     $(shell git submodule update --init --remote)
 endif
 
 EXTENSION=Mpdf
 
 # docker images
-MW_VERSION?=1.35
-PHP_VERSION?=7.4
-DB_TYPE?=sqlite
-DB_IMAGE?=""
+MW_VERSION?=1.39
+PHP_VERSION?=8.1
+DB_TYPE?=mysql
+DB_IMAGE?="mariadb:10"
 
 # extensions
 # Enables installation of apt packages for gd extension
-OS_PACKAGES?="zlib1g-dev libpng-dev"
+OS_PACKAGES?=zlib1g-dev libpng-dev
 
 # Enables installation of gd extension
 PHP_EXTENSIONS?=gd
@@ -29,7 +29,13 @@ COMPOSER_EXT?=true
 
 # nodejs
 # Enables node.js related tests and "npm install"
-# NODE_JS?=true
+NODE_JS?=true
 
-# check for build dir and git submodule init if it does not exist
 include build/Makefile
+
+.PHONY: composer-phan
+composer-phan: .init
+ifdef COMPOSER_EXT
+	$(show-current-target)
+	$(compose-exec-wiki) bash -c "cd $(EXTENSION_FOLDER) && composer phan $(COMPOSER_PARAMS)"
+endif
