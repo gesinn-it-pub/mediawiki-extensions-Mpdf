@@ -34,8 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `MpdfAction::show()`'s simple-output footer HTML and HTML-download HTTP headers
   extracted into `buildSimpleOutputHtml()`/`buildHtmlDownloadHeaders()`, and covered by
   both unit tests and a `MediaWikiIntegrationTestCase` driving `show()` end-to-end for
-  the `format=html` and `$wgMpdfSimpleOutput` branches, raising `MpdfAction` line coverage
-  from 44.09% to 83.51% (project-wide: 54.84% to 84.38%).
+  the `format=html`, `$wgMpdfSimpleOutput`, and PDF-generation branches (the latter
+  asserting a real `%PDF-`/`%%EOF` document is produced), raising `MpdfAction` line
+  coverage from 44.09% to 100% (project-wide: 54.84% to 96.88%).
 - `MpdfHooks::mpdftagsRender()` changed from an untyped `&$parser` parameter plus
   `func_get_args()` to a typed `Parser $parser, ...$params` signature, matching the
   pattern used by sibling parser-function hooks in this org.
@@ -60,5 +61,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `getName()`.
 - Removed the dead `wfSuppressWarnings()`/`wfRestoreWarnings()` pre-MW-1.31 fallback from
   `MpdfAction::show()`, since this extension's minimum supported version is now MW 1.39.
+- `MpdfAction::show()` called `\Wikimedia\suppressWarnings()`/`\Wikimedia\restoreWarnings()`,
+  which no longer exist as of MW 1.43 — every PDF export (the extension's core feature) fataled
+  with `Call to undefined function Wikimedia\suppressWarnings()` before reaching mPDF's own
+  output. This went unnoticed because the PDF-generation branch had no test coverage. Fixed to
+  use `\Wikimedia\AtEase\AtEase::suppressWarnings()`/`::restoreWarnings()`, and added an
+  integration test that actually generates and inspects a PDF, so a regression like this fails
+  the test suite instead of shipping silently.
 
 [Unreleased]: https://github.com/gesinn-it-pub/mediawiki-extensions-Mpdf/compare/1e5378d...HEAD

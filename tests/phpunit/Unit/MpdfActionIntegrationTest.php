@@ -77,4 +77,39 @@ class MpdfActionIntegrationTest extends MediaWikiIntegrationTestCase {
 		);
 		$this->assertStringContainsString( $page->getTitle()->getFullURL(), $html );
 	}
+
+	/**
+	 * @covers MpdfAction::show
+	 */
+	public function testShowWithoutFormatOutputsAValidPdf() {
+		// The rendered page includes the skin's logo and footer icons
+		// (e.g. "Powered by MediaWiki"), which mPDF resolves via
+		// $mpdf->setBasePath( 'http://127.0.0.1/' ) — no webserver listens
+		// there in the PHPUnit CLI environment. Configure an icon-less skin
+		// so WriteHTML() has nothing to fetch over HTTP.
+		$this->overrideConfigValues( [
+			'Logos' => [],
+			'FooterIcons' => [],
+		] );
+
+		$page = $this->getExistingTestPage( 'MpdfActionIntegrationPdfPage' );
+		// No 'format' request parameter takes the PDF-generation branch.
+		$action = $this->newAction( [], $page->getTitle() );
+
+		$previousCwd = getcwd();
+		chdir( MW_INSTALL_PATH );
+		try {
+			ob_start();
+			$action->show();
+			$pdf = ob_get_clean();
+		} finally {
+			chdir( $previousCwd );
+		}
+
+		$this->assertStringStartsWith( '%PDF-', $pdf );
+		$this->assertStringEndsWith( '%%EOF', $pdf );
+		// A blank page still runs to a few KB once fonts/metadata are embedded;
+		// a near-empty response would indicate WriteHTML()/Output() failed silently.
+		$this->assertGreaterThan( 1000, strlen( $pdf ) );
+	}
 }
