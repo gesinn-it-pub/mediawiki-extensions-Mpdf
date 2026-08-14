@@ -7,6 +7,13 @@
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="false">
             <directory suffix=".php">./</directory>
+            <exclude>
+                <directory>vendor</directory>
+                <directory>node_modules</directory>
+                <directory>tests</directory>
+                <directory>build</directory>
+                <directory>coverage</directory>
+            </exclude>
         </whitelist>
     </filter>
 </phpunit>

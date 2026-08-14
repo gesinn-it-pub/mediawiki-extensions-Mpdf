@@ -4,4 +4,8 @@
 	<file>.</file>
 	<arg name="extensions" value="php"/>
 	<arg name="encoding" value="UTF-8"/>
+	<exclude-pattern type="relative">^vendor/</exclude-pattern>
+	<exclude-pattern type="relative">^node_modules/</exclude-pattern>
+	<exclude-pattern type="relative">^build/</exclude-pattern>
+	<exclude-pattern type="relative">^coverage/</exclude-pattern>
 </ruleset>
