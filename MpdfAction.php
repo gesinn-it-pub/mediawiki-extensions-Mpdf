@@ -79,9 +79,9 @@ class MpdfAction extends Action {
 		// generates warnings (due to trying to add variables with a
 		// value of 'auto'), and if these get printed out, they can
 		// get into the PDF file and make it unreadable.
-		\Wikimedia\suppressWarnings();
+		\Wikimedia\AtEase\AtEase::suppressWarnings();
 		$mpdf->WriteHTML( $html );
-		\Wikimedia\restoreWarnings();
+		\Wikimedia\AtEase\AtEase::restoreWarnings();
 
 		$mpdf->Output( $filename . '.pdf', 'D' );
 
