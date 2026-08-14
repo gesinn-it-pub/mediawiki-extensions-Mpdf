@@ -2,6 +2,7 @@
 
 /**
  * @group MpdfHooks
+ * @group Skin
  */
 class MpdfHooksTest extends MediaWikiUnitTestCase {
 
@@ -88,5 +89,33 @@ class MpdfHooksTest extends MediaWikiUnitTestCase {
 		$this->assertEquals( '/index.php?action=mpdf', $sidebar[ 'TOOLBOX' ][ 'mpdf' ][ 'href' ] );
 		$this->assertEquals( 't-mpdf', $sidebar[ 'TOOLBOX' ][ 'mpdf' ][ 'id' ] );
 		$this->assertEquals( 'mpdf', $sidebar[ 'TOOLBOX' ][ 'mpdf' ][ 'rel' ] );
+	}
+
+	/**
+	 * @covers MpdfHooks::mpdftagsRender
+	 */
+	public function testMpdftagsRenderWrapsParamsInMpdfComment() {
+		$parser = $this->createMock( Parser::class );
+		$parser->method( 'insertStripItem' )->willReturnArgument( 0 );
+
+		$result = MpdfHooks::mpdftagsRender( $parser, 'format="A5"', 'orientation="L"' );
+
+		$this->assertSame(
+			"<!--mpdf<format=\"A5\" />\n<orientation=\"L\" />\nmpdf-->\n",
+			$result
+		);
+	}
+
+	/**
+	 * @covers MpdfHooks::mpdftagsRender
+	 */
+	public function testMpdftagsRenderEscapesAngleBrackets() {
+		$parser = $this->createMock( Parser::class );
+		$parser->method( 'insertStripItem' )->willReturnArgument( 0 );
+
+		$result = MpdfHooks::mpdftagsRender( $parser, '<script>alert(1)</script>' );
+
+		$this->assertStringNotContainsString( '<script>', $result );
+		$this->assertStringContainsString( '&lt;script&gt;alert(1)&lt;/script&gt;', $result );
 	}
 }

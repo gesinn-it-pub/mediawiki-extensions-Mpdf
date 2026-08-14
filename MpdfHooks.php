@@ -5,6 +5,8 @@ use MediaWiki\MediaWikiServices;
 class MpdfHooks {
 
 	/**
+	 * @see https://www.mediawiki.org/wiki/Manual:Hooks/ParserFirstCallInit
+	 *
 	 * @param Parser &$parser
 	 */
 	public static function onParserFirstCallInit( Parser &$parser ) {
@@ -12,8 +14,9 @@ class MpdfHooks {
 	}
 
 	/**
-	 * Add "PDF Export" link to the toolbox
-	 * Called with the SidebarBeforeOutput hook.
+	 * Add "PDF Export" link to the sidebar's toolbox
+	 *
+	 * @see https://www.mediawiki.org/wiki/Manual:Hooks/SidebarBeforeOutput
 	 *
 	 * @param Skin $skin
 	 * @param array &$sidebar
@@ -44,44 +47,44 @@ class MpdfHooks {
 	/**
 	 * Adds a "PDF Export" link to the set of tabs/actions, if one was
 	 * specified.
-	 * Called with the SkinTemplateNavigation::Universal hook.
 	 *
-	 * @param SkinTemplate $sktemplate
+	 * @see https://www.mediawiki.org/wiki/Manual:Hooks/SkinTemplateNavigation::Universal
+	 *
+	 * @param SkinTemplate $skinTemplate
 	 * @param array &$links
 	 */
-	public static function onSkinTemplateNavigationUniversal( SkinTemplate $sktemplate, array &$links ) {
+	public static function onSkinTemplateNavigationUniversal( SkinTemplate $skinTemplate, array &$links ) {
 		$mpdfTab = MediaWikiServices::getInstance()->getMainConfig()->get( 'MpdfTab' );
 
 		if ( $mpdfTab ) {
 			$links['views']['mpdf'] = [
 				'class' => false,
 				'text' => wfMessage( 'mpdf-action' )->text(),
-				'href' => $sktemplate->getTitle()->getLocalURL( 'action=mpdf' ),
+				'href' => $skinTemplate->getTitle()->getLocalURL( 'action=mpdf' ),
 			];
 		}
 	}
 
 	/**
-	 * @param Parser &$parser
-	 * @return mixed
+	 * Wraps the given parameters in an HTML comment marker that
+	 * MpdfAction::show() later parses out to configure PDF generation
+	 * (page format, margins, orientation).
+	 *
+	 * @param Parser $parser
+	 * @param string ...$params
+	 * @return string
 	 */
-	public static function mpdftagsRender( &$parser ) {
-		// Get the parameters that were passed to this function
-		$params = func_get_args();
-		array_shift( $params );
+	public static function mpdftagsRender( Parser $parser, ...$params ) {
+		// Escape angle brackets so the parameters cannot inject markup.
+		$escapedParams = str_replace( [ '<', '>' ], [ '&lt;', '&gt;' ], $params );
 
-		// Replace open and close tag for security reason
-		$values = str_replace( [ '<', '>' ], [ '&lt;', '&gt;' ], $params );
-
-		// Insert mpdf tags between <!--mpdf ... mpdf-->
-		$return = '<!--mpdf';
-		foreach ( $values as $val ) {
-			$return .= "<" . $val . " />\n";
+		$comment = '<!--mpdf';
+		foreach ( $escapedParams as $param ) {
+			$comment .= '<' . $param . " />\n";
 		}
-		$return .= "mpdf-->\n";
+		$comment .= "mpdf-->\n";
 
-		// Return mpdf tags as raw html
-		return $parser->insertStripItem( $return );
+		return $parser->insertStripItem( $comment );
 	}
 
 }

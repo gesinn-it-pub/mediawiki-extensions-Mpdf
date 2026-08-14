@@ -1,197 +1,120 @@
 <?php
 
-use MediaWiki\MediaWikiServices;
-use PHPUnit\Framework\TestCase;
-
 /**
+ * @covers MpdfAction
  * @group MpdfAction
  */
-class MpdfActionTest extends TestCase {
+class MpdfActionTest extends MediaWikiUnitTestCase {
 
-	/**
-	 * Configuration setting for determining whether to use simple output mode in mPDF.
-	 *
-	 * @var bool
-	 */
-	protected $wgMpdfSimpleOutput;
+	private function callSanitizeFilename( string $titletext ): string {
+		$method = new ReflectionMethod( MpdfAction::class, 'sanitizeFilename' );
+		$method->setAccessible( true );
+		return $method->invoke( null, $titletext );
+	}
 
-	/**
-	 * @covers MpdfAction::getName
-	 */
-	public function testGetNameReturnsCorrectActionName() {
-		$action = $this->getMockBuilder( MpdfAction::class )
-					   ->disableOriginalConstructor()
-					   ->getMock();
+	private function callImageSrcToDataUri( string $src ): string {
+		$method = new ReflectionMethod( MpdfAction::class, 'imageSrcToDataUri' );
+		$method->setAccessible( true );
+		return $method->invoke( null, $src );
+	}
 
-		// Define what getName() should return in the mocked MpdfAction
-		$action->expects( $this->any() )
-			   ->method( 'getName' )
-			   ->willReturn( 'mpdf' );
-
-		// Call the getName() method
-		$name = $action->getName();
-
-		// Assert that the returned name matches 'mpdf'
-		$this->assertEquals( 'mpdf', $name );
+	private function callParseMpdfConfig( string $html ): array {
+		$method = new ReflectionMethod( MpdfAction::class, 'parseMpdfConfig' );
+		$method->setAccessible( true );
+		return $method->invoke( null, $html );
 	}
 
 	/**
-	 * @covers MpdfAction::show
+	 * @covers MpdfAction::sanitizeFilename
+	 * @dataProvider provideUnsafeFilenameCharacters
 	 */
-	public function testCheckOutputOfHtmlInsideShowMethod() {
-		// Set up expectations
-		$titleText = 'Test_Title';
-		$outputHtml = '<html><body>Test HTML</body></html>';
-		$format = 'html';
-
-		// Mock objects
-		$outputPageMock = $this->createMock( OutputPage::class );
-		$titleMock = $this->createMock( Title::class );
-		$articleMock = $this->getMockBuilder( Article::class )
-						->disableOriginalConstructor()
-						->getMock();
-
-		$requestMock = $this->getMockBuilder( WebRequest::class )
-					   ->disableOriginalConstructor()
-					   ->getMock();
-
-		$requestMock->expects( $this->any() )
-				->method( 'getText' )
-				->willReturn( 'format' );
-
-		 // Mocking getTitle() method
-		 $titleMock->expects( $this->any() )
-		 ->method( 'getPrefixedText' )
-		 ->willReturn( $titleText );
-
-		// Mocking getOutput() method
-		$outputPageMock->expects( $this->any() )
-					->method( 'getOutput' )
-					->willReturn( $outputHtml );
-
-		// Mocking output() method
-		$outputPageMock->expects( $this->any() )
-					->method( 'output' )
-					->willReturn( $outputHtml );
-
-		$titleToCheck = $titleMock->getPrefixedText();
-		$format = 'html';
-		$output = $outputPageMock;
-
-		$filename = str_replace( [ '\\', '/', ':', '*', '?', '"', '<', '>', "\n", "\r", "\0" ], '_', $titleText );
-		MediaWikiServices::getInstance()->getHookContainer()->run( 'MpdfGetArticle', [ $titleText, &$article ] );
-
-		$this->assertEquals( $titleText, $titleToCheck );
-
-		if ( !$this->wgMpdfSimpleOutput ) {
-			ob_start();
-			$articleMock->expects( $this->any() )
-						->method( 'view' )
-						->willReturn( $outputHtml );
-
-			$html = $articleMock->view();
-			$outputPageMock->output();
-
-			$this->assertStringContainsString( "Test HTML", $html );
-			$html = ob_get_clean();
-		}
+	public function testSanitizeFilenameReplacesUnsafeCharacters( string $titletext, string $expected ) {
+		$this->assertSame( $expected, $this->callSanitizeFilename( $titletext ) );
 	}
 
-	/**
-	 * @covers MpdfAction::show
-	 */
-	public function testImgTagsTransformedToDataUri() {
-		// Path to your test image
-		$imagePath = __DIR__ . '/images/MediaWiki-2020.png';
-
-		// Simulated HTML output with <img> tags
-		$html = '<html><body><img src="/tests/images/MediaWiki-2020.png"></body></html>';
-
-		// Simulate the process of transforming img tags to data URIs
-		$dom = new DOMDocument;
-		$dom->loadHTML( $html );
-		$xpath = new DOMXPath( $dom );
-		$imgTags = $xpath->query( '//img' );
-
-		// Apply the transformation as done in the original code
-		foreach ( $imgTags as $img ) {
-			$src = $img->getAttribute( 'src' );
-			$src = ltrim( $src, '/' );
-			$imageData = base64_encode( file_get_contents( $src ) );
-			$dataUri = 'data:image/' . pathinfo( $src, PATHINFO_EXTENSION ) . ';base64,' . $imageData;
-			$img->setAttribute( 'src', $dataUri );
-		}
-
-		// Get the updated HTML content
-		$updatedHtml = $dom->saveHTML();
-
-		// Assert that the transformation was successful
-		$this->assertStringContainsString( 'data:image', $updatedHtml );
-	}
-
-	/**
-	 * @covers MpdfAction::show
-	 */
-	public function testPdfGeneration() {
-		// HTML content to test
-		$html = '<html><body><h1>Hello, PDF!</h1></body></html>';
-
-		// Assume $filename is generated dynamically in your actual code
-		$filename = 'test_document';
-
-		// Call your PDF generation method
-		$pdfFilePath = $this->generatePdf( $html, $filename );
-
-		// Assert that the PDF file was generated
-		$this->assertFileExists( $pdfFilePath );
-		$this->assertStringContainsString( '.pdf', $pdfFilePath );
-
-		// Clean up: delete the generated PDF after testing
-		unlink( $pdfFilePath );
-	}
-
-	private function generatePdf( $html, $filename ) {
-		// Your original PDF generation code
-		$mode = 'utf-8';
-		$format = 'A4';
-		$marginLeft = 15;
-		$marginRight = 15;
-		$marginTop = 16;
-		$marginBottom = 16;
-		$marginHeader = 9;
-		$marginFooter = 9;
-		$orientation = 'P';
-
-		// Example: Use a temporary directory for testing
-		$tempDir = sys_get_temp_dir();
-
-		// Configuration array
-		$config = [
-			'mode' => $mode,
-			'format' => $format,
-			'margin_left' => $marginLeft,
-			'margin_right' => $marginRight,
-			'margin_top' => $marginTop,
-			'margin_bottom' => $marginBottom,
-			'margin_header' => $marginHeader,
-			'margin_footer' => $marginFooter,
-			'orientation' => $orientation
+	public static function provideUnsafeFilenameCharacters(): array {
+		return [
+			'plain title' => [ 'Test_Title', 'Test_Title' ],
+			'namespaced title with colon' => [ 'Category:Foo', 'Category_Foo' ],
+			'path separators' => [ 'a/b\\c', 'a_b_c' ],
+			'reserved characters' => [ 'a*b?c"d<e>f', 'a_b_c_d_e_f' ],
+			'control characters' => [ "a\nb\rc\0d", 'a_b_c_d' ],
 		];
+	}
 
-		// Create mPDF instance
-		$mpdf = new \Mpdf\Mpdf( $config );
+	/**
+	 * @covers MpdfAction::imageSrcToDataUri
+	 */
+	public function testImageSrcToDataUriEncodesFileContentsAsBase64() {
+		$imagePath = __DIR__ . '/../../images/MediaWiki-2020.png';
+		$this->assertFileExists( $imagePath );
 
-		// Write HTML content to PDF
-		$mpdf->WriteHTML( $html );
+		$dataUri = $this->callImageSrcToDataUri( 'tests/images/MediaWiki-2020.png' );
 
-		// Set base URL for images (if needed)
-		$url = 'http://localhost/';
-		$mpdf->setBasePath( $url );
+		$expected = 'data:image/png;base64,' . base64_encode( file_get_contents( $imagePath ) );
+		$this->assertSame( $expected, $dataUri );
+	}
 
-		// Output PDF to a file (for testing, use a temporary directory)
-		$pdfFilePath = $tempDir . '/' . $filename . '.pdf';
-		$mpdf->Output( $pdfFilePath, 'F' );
+	/**
+	 * @covers MpdfAction::imageSrcToDataUri
+	 */
+	public function testImageSrcToDataUriStripsLeadingSlash() {
+		$dataUriWithSlash = $this->callImageSrcToDataUri( '/tests/images/MediaWiki-2020.png' );
+		$dataUriWithoutSlash = $this->callImageSrcToDataUri( 'tests/images/MediaWiki-2020.png' );
 
-		return $pdfFilePath;
+		$this->assertSame( $dataUriWithoutSlash, $dataUriWithSlash );
+	}
+
+	/**
+	 * @covers MpdfAction::parseMpdfConfig
+	 */
+	public function testParseMpdfConfigReturnsDefaultsWithoutConstructorTag() {
+		$config = $this->callParseMpdfConfig( '<html><body>No constructor tag here</body></html>' );
+
+		$this->assertSame( [
+			'mode' => 'utf-8',
+			'format' => 'A4',
+			'margin_left' => 15,
+			'margin_right' => 15,
+			'margin_top' => 16,
+			'margin_bottom' => 16,
+			'margin_header' => 9,
+			'margin_footer' => 9,
+			'orientation' => 'P',
+		], $config );
+	}
+
+	/**
+	 * @covers MpdfAction::parseMpdfConfig
+	 */
+	public function testParseMpdfConfigAppliesConstructorTagOverrides() {
+		$html = 'content<!--mpdf<constructor format="A5" orientation="L" '
+			. 'margin-left="10" margin-right="11" margin-top="12" '
+			. 'margin-bottom="13" margin-header="5" margin-footer="6" />mpdf-->';
+
+		$config = $this->callParseMpdfConfig( $html );
+
+		$this->assertSame( 'A5', $config['format'] );
+		$this->assertSame( 'L', $config['orientation'] );
+		$this->assertSame( 10.0, $config['margin_left'] );
+		$this->assertSame( 11.0, $config['margin_right'] );
+		$this->assertSame( 12.0, $config['margin_top'] );
+		$this->assertSame( 13.0, $config['margin_bottom'] );
+		$this->assertSame( 5.0, $config['margin_header'] );
+		$this->assertSame( 6.0, $config['margin_footer'] );
+	}
+
+	/**
+	 * @covers MpdfAction::parseMpdfConfig
+	 */
+	public function testParseMpdfConfigAppliesPartialConstructorTagOverrides() {
+		$html = 'content<!--mpdf<constructor format="Letter" />mpdf-->';
+
+		$config = $this->callParseMpdfConfig( $html );
+
+		$this->assertSame( 'Letter', $config['format'] );
+		// Everything else keeps its default.
+		$this->assertSame( 'P', $config['orientation'] );
+		$this->assertSame( 15, $config['margin_left'] );
 	}
 }
