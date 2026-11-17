@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Resolve 7 Dependabot security alerts in development/lint tooling dependencies (no runtime impact) [`dd65c02`](https://github.com/gesinn-it-pub/mediawiki-extensions-Mpdf/commit/dd65c02)
+
 ## [1.0.1] - 2026-08-14
 
 Fixes a fatal error that broke PDF export on MediaWiki 1.43 and newer, and resolves
