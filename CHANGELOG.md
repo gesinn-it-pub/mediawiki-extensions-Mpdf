@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-11-17
+
+Resolves outstanding dependency security alerts in development tooling.
+
 ### Changed
 
 - Resolve 7 Dependabot security alerts in development/lint tooling dependencies (no runtime impact) [`dd65c02`](https://github.com/gesinn-it-pub/mediawiki-extensions-Mpdf/commit/dd65c02)
@@ -24,5 +28,6 @@ outstanding dependency security alerts.
 
 - Fix a fatal error on every PDF export under MediaWiki 1.43+ (`Call to undefined function Wikimedia\suppressWarnings()`) [`0deb683`](https://github.com/gesinn-it-pub/mediawiki-extensions-Mpdf/commit/0deb683)
 
-[Unreleased]: https://github.com/gesinn-it-pub/mediawiki-extensions-Mpdf/compare/1.0.1...HEAD
+[Unreleased]: https://github.com/gesinn-it-pub/mediawiki-extensions-Mpdf/compare/1.0.2...HEAD
+[1.0.2]: https://github.com/gesinn-it-pub/mediawiki-extensions-Mpdf/compare/1.0.1...1.0.2
 [1.0.1]: https://github.com/gesinn-it-pub/mediawiki-extensions-Mpdf/compare/1.0...1.0.1
